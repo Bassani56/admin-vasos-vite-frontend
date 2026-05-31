@@ -16,7 +16,6 @@ function App() {
           <Route path="/admin" element={ <AdminPage/> }/>
           <Route path="/edit" element={ <EditPage/> }/>
 
-          // App.jsx / router
           <Route path="/catalogo" element={<Catalogo />} />
           <Route path="/produto/:id" element={<Produto />} />
             

@@ -365,8 +365,8 @@ export default function AdminPage() {
   return (
     <div className="admin-card-container">
         <div>
-            <a href="/edit" >Voltar</a> <br />
-        <a href="/catalogo">Ver Catalogo</a>
+            <a href="/" >Voltar</a> <br />
+        {/* <a href="/catalogo">Ver Catalogo</a> */}
         </div>
       <div className="admin-card">
         {/* ================= ERRO ================= */}

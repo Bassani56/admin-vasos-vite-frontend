@@ -10,12 +10,24 @@ export default function EditPage() {
   const [uploading, setUploading] = useState(false);
   const [statusMessage, setStatusMessage] = useState("");
 
+  const getProductKey = (p) => p?.id || p?._id || null;
+
   useEffect(() => {
     async function fetchProducts() {
       try {
         const res = await fetch(`${API_BASE_URL}/produtos`);
         const data = await res.json();
-        setProducts(Array.isArray(data) ? data : [data]);
+        const items = Array.isArray(data) ? data : [data];
+        // dedupe products by id/_id to avoid duplicate keys
+        const seen = new Set();
+        const deduped = items.filter((it) => {
+          const k = getProductKey(it);
+          if (!k) return true;
+          if (seen.has(k)) return false;
+          seen.add(k);
+          return true;
+        });
+        setProducts(deduped);
       } catch (err) {
         console.error("Erro ao buscar produtos:", err);
       }
@@ -329,11 +341,13 @@ export default function EditPage() {
         imagens_por_cor: normalizeColorBuckets(updatedProduct.imagens_por_cor),
       });
 
-      setProducts((prev) =>
-        prev.map((product) =>
-          product.id === updatedProduct.id || product._id === updatedProduct._id ? updatedProduct : product
-        )
-      );
+      setProducts((prev) => {
+        const key = getProductKey(updatedProduct);
+        if (!key) return prev.map((p) => (p === updatedProduct ? updatedProduct : p));
+        // replace existing product with same key, or add if missing — keep list unique
+        const others = prev.filter((p) => getProductKey(p) !== key);
+        return [updatedProduct, ...others];
+      });
     } catch (err) {
       console.error(err);
       setStatusMessage(`Erro ao salvar produto: ${err.message}`);

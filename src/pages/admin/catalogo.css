@@ -1,0 +1,138 @@
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap');
+
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+body {
+  background-color: #f4f3f0;
+  font-family: 'DM Sans', sans-serif;
+  margin: 0;
+  padding: 0;
+  color: #1a1a1a;
+}
+
+/* ─── Catálogo ────────────────────────────────────────────── */
+
+.catalogo-page {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.catalogo-container {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 48px 24px 80px;
+  flex: 1;
+}
+
+.catalogo-heading {
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: #999;
+  margin: 0 0 28px;
+}
+
+.catalogo-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 16px;
+}
+
+/* ─── Product card ────────────────────────────────────────── */
+
+.produto-card {
+  background: #ffffff;
+  border-radius: 12px;
+  overflow: hidden;
+  border: 1.5px solid transparent;
+  cursor: pointer;
+  transition: border-color 0.18s ease, transform 0.18s ease, box-shadow 0.18s ease;
+  text-decoration: none;
+  color: inherit;
+  display: block;
+}
+
+.produto-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+  border-color: #d0cdc7;
+}
+
+.produto-card-img {
+  width: 100%;
+  height: 240px;
+  object-fit: cover;
+  display: block;
+  background: #ece9e3;
+}
+
+.produto-card-img-placeholder {
+  width: 100%;
+  height: 240px;
+  background: #ece9e3;
+}
+
+.produto-card-body {
+  padding: 14px 16px 18px;
+}
+
+.produto-card-label {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #aaa;
+  margin: 0 0 4px;
+}
+
+.produto-card-title {
+  font-size: 14px;
+  font-weight: 500;
+  margin: 0 0 8px;
+  color: #1a1a1a;
+  line-height: 1.4;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.produto-card-from {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: #bbb;
+  margin: 0 0 2px;
+}
+
+.produto-card-price {
+  font-family: 'DM Mono', monospace;
+  font-size: 15px;
+  font-weight: 500;
+  color: #1a1a1a;
+  margin: 0;
+}
+
+/* ─── Loading / empty states ──────────────────────────────── */
+
+.catalogo-loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 200px;
+  font-size: 14px;
+  color: #aaa;
+}
+
+/* ─── Responsive ──────────────────────────────────────────── */
+
+@media (max-width: 600px) {
+  .catalogo-container {
+    padding: 24px 16px 60px;
+  }
+}

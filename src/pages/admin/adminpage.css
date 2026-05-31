@@ -1,0 +1,152 @@
+.admin-card-container {
+  display: flex;
+  justify-content: center;
+  padding: 40px;
+  background: #f4f6f8;
+  min-height: 100vh;
+}
+
+.admin-card {
+  width: 100%;
+  max-width: 520px;
+  background: #ffffff;
+  border-radius: 12px;
+  padding: 24px;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
+
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+/* ======================
+   INPUTS GERAIS
+====================== */
+
+.admin-card input,
+.admin-card select {
+  padding: 10px 12px;
+  border-radius: 8px;
+  border: 1px solid #ddd;
+  outline: none;
+  font-size: 14px;
+  transition: 0.2s;
+}
+
+.admin-card input:focus,
+.admin-card select:focus {
+  border-color: #4f46e5;
+  box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.15);
+}
+
+/* ======================
+   IMAGEM
+====================== */
+
+.admin-card img {
+  width: 100%;
+  max-height: 220px;
+  object-fit: cover;
+  border-radius: 10px;
+  margin-top: 10px;
+  border: 1px solid #eee;
+}
+
+/* ======================
+   VARIAÇÕES
+====================== */
+
+.admin-variation {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 8px;
+  align-items: center;
+}
+
+.admin-variation input {
+  width: 100%;
+}
+
+/* ======================
+   BOTÕES
+====================== */
+
+.admin-card button {
+  padding: 10px 12px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 500;
+  transition: 0.2s;
+}
+
+.admin-card button:hover {
+  transform: translateY(-1px);
+}
+
+/* botão adicionar variação */
+.admin-card button:nth-of-type(1) {
+  background: #e5e7eb;
+}
+
+/* botão salvar */
+.admin-card button:nth-of-type(2) {
+  background: #4f46e5;
+  color: white;
+}
+
+/* ======================
+   RESPONSIVO
+====================== */
+
+@media (max-width: 600px) {
+  .admin-variation {
+    grid-template-columns: 1fr;
+  }
+
+  .admin-card {
+    padding: 16px;
+  }
+}
+
+.admin-image-preview {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-top: 10px;
+}
+
+.admin-image-preview img {
+  width: 90px;
+  height: 90px;
+  object-fit: cover;
+  border-radius: 8px;
+  border: 1px solid #ddd;
+}
+
+
+.admin-error-box {
+  background: #ffe5e5;
+  color: #b00020;
+  padding: 10px;
+  border-radius: 8px;
+  margin-bottom: 10px;
+  font-size: 14px;
+}
+
+.admin-img-box {
+  position: relative;
+  display: inline-block;
+  margin-right: 8px;
+}
+
+.admin-img-box button {
+  position: absolute;
+  top: 2px;
+  right: 2px;
+  background: red;
+  color: white;
+  border: none;
+  border-radius: 50%;
+  cursor: pointer;
+}

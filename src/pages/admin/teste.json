@@ -1,0 +1,171 @@
+[
+    {
+  "id": 5,
+
+  "ativo": true,
+
+  "titulo_geral": "Vaso Cilindro Alto",
+
+  "descricao": "Vaso artesanal produzido em cimento.",
+
+  "imagem_geral": {
+    "url": "https://oleiroo-bucket-cloud.s3.us-east-2.amazonaws.com/capa-produto.webp",
+    "filename": "capa-produto.webp"
+  },
+
+  "variantes": [
+    {
+      "id": "natural-20x30",
+      "titulo": null,
+      "imagem": {
+        "url": "https://oleiroo-bucket-cloud.s3.us-east-2.amazonaws.com/1780061131166-exemplo-natural-site2.webp",
+        "filename": "natural-20x30.webp"
+      },
+      "acabamento": "natural",
+      "desenho": "liso",
+      "tamanho": "20x30",
+      "dimensoes": {
+        "altura": 20,
+        "largura": 30
+      },
+      "preco": 35
+    },
+
+    {
+      "id": "natural-30x35",
+      "titulo": null,
+      "imagem": {
+        "url": "https://oleiroo-bucket-cloud.s3.us-east-2.amazonaws.com/1780061129781-exemplo-natural-site1.webp",
+        "filename": "natural-30x35.webp"
+      },
+      "acabamento": "natural",
+      "desenho": "liso",
+      "tamanho": "30x35",
+      "dimensoes": {
+        "altura": 30,
+        "largura": 35
+      },
+      "preco": 45
+    },
+
+    {
+      "id": "bege-20x30",
+      "titulo": null,
+      "imagem": {
+        "url": null,
+        "filename": null
+      },
+      "acabamento": "bege",
+      "desenho": "liso",
+      "tamanho": "20x30",
+      "dimensoes": {
+        "altura": 20,
+        "largura": 30
+      },
+      "preco": 45
+    },
+
+    {
+      "id": "amarelo-40x60",
+      "titulo": "Vaso Cilindro Alto Edição Especial",
+      "imagem": {
+        "url": null,
+        "filename": "amarelo-40x60.webp"
+      },
+      "acabamento": "bege",
+      "desenho": "liso",
+      "tamanho": "30x35",
+      "dimensoes": {
+        "altura": 30,
+        "largura": 35
+      },
+      "preco": 60
+    },
+
+    {
+      "id": "amarelo-40x60",
+      "titulo": "Vaso Cilindro Alto Edição Especial",
+      "imagem": {
+        "url": null,
+        "filename": "amarelo-40x60.webp"
+      },
+      "acabamento": "amarelo",
+      "desenho": "liso",
+      "tamanho": "20x30",
+      "dimensoes": {
+        "altura": 20,
+        "largura": 30
+      },
+      "preco": 45
+    },
+
+    {
+      "id": "amarelo-40x60",
+      "titulo": "Vaso Cilindro Alto Edição Especial",
+      "imagem": {
+        "url": null,
+        "filename": "amarelo-40x60.webp"
+      },
+      "acabamento": "amarelo",
+      "desenho": "liso",
+      "tamanho": "30x35",
+      "dimensoes": {
+        "altura": 30,
+        "largura": 35
+      },
+      "preco": 60
+    }
+  ]
+},
+{
+  "id": 1,
+
+  "titulo_geral": "Vaso Cilindro Baixo",
+
+  "imagem_geral": {
+    "url": "capa.webp"
+  },
+
+  "variantes": [
+    {
+      "id": "natural-20x34",
+
+      "titulo": null,
+
+      "imagem": {
+        "url": "https://oleiroo-bucket-cloud.s3.us-east-2.amazonaws.com/1780061131363-exemplo-natural-site3.webp"
+      },
+
+      "acabamento": "natural",
+
+      "desenho": "liso",
+
+      "dimensoes": {
+        "altura": 20,
+        "largura": 30
+      },
+
+      "preco": 35
+    },
+
+    {
+      "id": "natural-30x37",
+
+      "titulo": null,
+
+      "imagem": null,
+
+      "acabamento": "natural",
+
+      "desenho": "liso",
+
+      "dimensoes": {
+        "altura": 30,
+        "largura": 35
+      },
+
+      "preco": 45
+    }
+  ]
+}
+]

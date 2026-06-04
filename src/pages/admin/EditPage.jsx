@@ -9,6 +9,7 @@ export default function EditPage() {
   const [newCategory, setNewCategory] = useState("");
   const [uploading, setUploading] = useState(false);
   const [statusMessage, setStatusMessage] = useState("");
+  const [savingOrder, setSavingOrder] = useState(false);
 
   const getProductKey = (p) => p?.id || p?._id || null;
 
@@ -18,7 +19,6 @@ export default function EditPage() {
         const res = await fetch(`${API_BASE_URL}/produtos`);
         const data = await res.json();
         const items = Array.isArray(data) ? data : [data];
-        // dedupe products by id/_id to avoid duplicate keys
         const seen = new Set();
         const deduped = items.filter((it) => {
           const k = getProductKey(it);
@@ -27,6 +27,8 @@ export default function EditPage() {
           seen.add(k);
           return true;
         });
+
+        deduped.sort((a, b) => (a.ordem ?? Infinity) - (b.ordem ?? Infinity));
         setProducts(deduped);
       } catch (err) {
         console.error("Erro ao buscar produtos:", err);
@@ -35,6 +37,63 @@ export default function EditPage() {
 
     fetchProducts();
   }, []);
+
+  // ─── Alterar ordem com troca automática ──────────────────────────────────
+
+  const handleChangeOrdem = async (productId, novaOrdem) => {
+    const novaOrdemNum = Number(novaOrdem);
+    if (isNaN(novaOrdemNum)) return;
+
+    // Produto que está sendo alterado
+    const produtoAlvo = products.find((p) => getProductKey(p) === productId);
+    if (!produtoAlvo) return;
+
+    // Produto que já ocupa a nova ordem (se existir)
+    const produtoDeslocado = products.find(
+      (p) => p.ordem === novaOrdemNum && getProductKey(p) !== productId
+    );
+
+    const ordemAnterior = produtoAlvo.ordem ?? null;
+
+    // Atualiza localmente
+    setProducts((prev) => {
+      const atualizados = prev.map((p) => {
+        if (getProductKey(p) === productId) return { ...p, ordem: novaOrdemNum };
+        if (produtoDeslocado && getProductKey(p) === getProductKey(produtoDeslocado))
+          return { ...p, ordem: ordemAnterior };
+        return p;
+      });
+      return [...atualizados].sort((a, b) => (a.ordem ?? Infinity) - (b.ordem ?? Infinity));
+    });
+
+    // Salva no banco
+    try {
+      setSavingOrder(true);
+      const requisicoes = [
+        fetch(`${API_BASE_URL}/produto/${productId}`, {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ ordem: novaOrdemNum }),
+        }),
+      ];
+      if (produtoDeslocado) {
+        requisicoes.push(
+          fetch(`${API_BASE_URL}/produto/${getProductKey(produtoDeslocado)}`, {
+            method: "PUT",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ ordem: ordemAnterior }),
+          })
+        );
+      }
+      await Promise.all(requisicoes);
+    } catch (err) {
+      console.error("Erro ao salvar ordem:", err);
+    } finally {
+      setSavingOrder(false);
+    }
+  };
+
+  // ─── Restante sem alteração ───────────────────────────────────────────────
 
   const normalizeImages = (raw) => {
     if (!raw) return [];
@@ -85,44 +144,30 @@ export default function EditPage() {
       }
     }
     if (product.imagem_geral && product.imagem_geral.url) return product.imagem_geral.url;
-    if (Array.isArray(product.imagem_geral) && product.imagem_geral.length > 0) return product.imagem_geral[0].url;
-
-    console.log("Produto sem imagem encontrada:", product);
-
+    if (Array.isArray(product.imagem_geral) && product.imagem_geral.length > 0)
+      return product.imagem_geral[0].url;
     return null;
   };
 
   const imageTypes = (() => {
     if (!editorData) return [];
-
     const types = new Set();
     const hasNatural = editorData.variantes?.some(
       (v) => (v.acabamento || v.cor || "").toString().toLowerCase() === "natural"
     );
-
-    if (hasNatural) {
-      types.add("natural");
-    }
-
+    if (hasNatural) types.add("natural");
     editorData.variantes?.forEach((v) => {
       const type = (v.acabamento || v.cor || "").toString();
-      if (type && type.toLowerCase() !== "natural") {
-        types.add(type);
-      }
+      if (type && type.toLowerCase() !== "natural") types.add(type);
     });
-
     editorData.imagens_por_cor?.forEach((bucket) => {
-      if (bucket.cor) {
-        types.add(bucket.cor);
-      }
+      if (bucket.cor) types.add(bucket.cor);
     });
-
     return Array.from(types);
   })();
 
   const updateVariant = (index, field, value) => {
     if (!editorData || !editorData.variantes) return;
-
     setEditorData((prev) => {
       if (!prev || !prev.variantes) return prev;
       const newVariantes = [...prev.variantes];
@@ -140,16 +185,12 @@ export default function EditPage() {
     if (!editorData) return;
     const category = newCategory.trim();
     if (!category) return;
-
     setEditorData((prev) => {
       if (!prev) return prev;
       const nextCategories = Array.isArray(prev.categorias) ? [...prev.categorias] : [];
-      if (!nextCategories.includes(category)) {
-        nextCategories.push(category);
-      }
+      if (!nextCategories.includes(category)) nextCategories.push(category);
       return { ...prev, categorias: nextCategories };
     });
-
     setNewCategory("");
   };
 
@@ -157,10 +198,7 @@ export default function EditPage() {
     if (!editorData) return;
     setEditorData((prev) => {
       if (!prev) return prev;
-      return {
-        ...prev,
-        categorias: (prev.categorias || []).filter((_, i) => i !== index),
-      };
+      return { ...prev, categorias: (prev.categorias || []).filter((_, i) => i !== index) };
     });
   };
 
@@ -184,20 +222,13 @@ export default function EditPage() {
   const removeVariant = (index) => {
     if (!editorData || !editorData.variantes) return;
     setEditorData((prev) =>
-      prev
-        ? {
-            ...prev,
-            variantes: prev.variantes.filter((_, i) => i !== index),
-          }
-        : prev
+      prev ? { ...prev, variantes: prev.variantes.filter((_, i) => i !== index) } : prev
     );
   };
 
   const getBucketImages = (type) => {
     if (!editorData) return [];
-    if (type === "imagem_geral") {
-      return normalizeImages(editorData.imagem_geral);
-    }
+    if (type === "imagem_geral") return normalizeImages(editorData.imagem_geral);
     const bucket = editorData.imagens_por_cor?.find((item) => item.cor === type);
     return bucket?.imagens ? normalizeImages(bucket.imagens) : [];
   };
@@ -206,12 +237,7 @@ export default function EditPage() {
     if (!files || files.length === 0) return [];
     const formData = new FormData();
     files.forEach((file) => formData.append("images", file));
-
-    const res = await fetch(`${API_BASE_URL}/upload`, {
-      method: "POST",
-      body: formData,
-    });
-
+    const res = await fetch(`${API_BASE_URL}/upload`, { method: "POST", body: formData });
     const data = await res.json();
     return Array.isArray(data.images)
       ? data.images.map((img) => ({ url: img.url, filename: img.fileName }))
@@ -220,26 +246,18 @@ export default function EditPage() {
 
   const handleUploadBucketImages = async (type, files) => {
     if (!files || files.length === 0 || !editorData) return;
-
     try {
       setUploading(true);
       setStatusMessage(`Enviando imagens para ${type}...`);
-
       const uploadedImages = await uploadImages(files);
-      if (uploadedImages.length === 0) {
-        setStatusMessage("Nenhuma imagem enviada.");
-        return;
-      }
-
+      if (uploadedImages.length === 0) { setStatusMessage("Nenhuma imagem enviada."); return; }
       setEditorData((prev) => {
         if (!prev) return prev;
-
         const next = {
           ...prev,
           imagem_geral: normalizeImages(prev.imagem_geral),
           imagens_por_cor: normalizeColorBuckets(prev.imagens_por_cor),
         };
-
         if (type === "imagem_geral") {
           next.imagem_geral = [...next.imagem_geral, ...uploadedImages];
         } else {
@@ -251,16 +269,11 @@ export default function EditPage() {
               imagens: [...normalizeImages(bucket.imagens), ...uploadedImages],
             };
           } else {
-            next.imagens_por_cor = [
-              ...next.imagens_por_cor,
-              { cor: type, imagens: uploadedImages },
-            ];
+            next.imagens_por_cor = [...next.imagens_por_cor, { cor: type, imagens: uploadedImages }];
           }
         }
-
         return next;
       });
-
       setStatusMessage(`Imagens adicionadas a ${type}.`);
     } catch (error) {
       console.error(error);
@@ -272,7 +285,6 @@ export default function EditPage() {
 
   const handleRemoveImage = (type, index) => {
     if (!editorData) return;
-
     setEditorData((prev) => {
       if (!prev) return prev;
       const next = {
@@ -280,7 +292,6 @@ export default function EditPage() {
         imagem_geral: normalizeImages(prev.imagem_geral),
         imagens_por_cor: normalizeColorBuckets(prev.imagens_por_cor),
       };
-
       if (type === "imagem_geral") {
         next.imagem_geral = next.imagem_geral.filter((_, i) => i !== index);
       } else {
@@ -289,25 +300,17 @@ export default function EditPage() {
           return { ...bucket, imagens: bucket.imagens.filter((_, i) => i !== index) };
         });
       }
-
       return next;
     });
   };
 
   const handleSave = async () => {
-    console.log("Salvando produto:", editorData);
-
     if (!editorData) return;
     const id = editorData.id || editorData._id;
-    if (!id) {
-      setStatusMessage("Produto inválido para salvar.");
-      return;
-    }
-
+    if (!id) { setStatusMessage("Produto inválido para salvar."); return; }
     try {
       setUploading(true);
       setStatusMessage("Salvando alterações...");
-
       const payload = {
         titulo_geral: editorData.titulo_geral,
         categorias: editorData.categorias || [],
@@ -315,24 +318,15 @@ export default function EditPage() {
         imagens_por_cor: normalizeColorBuckets(editorData.imagens_por_cor),
         variantes: editorData.variantes || [],
       };
-
       const res = await fetch(`${API_BASE_URL}/products/${id}`, {
         method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
       });
-
       if (!res.ok) {
         const errorData = await res.json();
-        throw new Error(
-          errorData.erro ||
-          errorData.details?.join(", ") ||
-          "Falha ao salvar produto"
-        );
+        throw new Error(errorData.erro || errorData.details?.join(", ") || "Falha ao salvar produto");
       }
-
       const updatedProduct = await res.json();
       setStatusMessage("Produto atualizado com sucesso.");
       setEditorData({
@@ -340,11 +334,9 @@ export default function EditPage() {
         imagem_geral: normalizeImages(updatedProduct.imagem_geral),
         imagens_por_cor: normalizeColorBuckets(updatedProduct.imagens_por_cor),
       });
-
       setProducts((prev) => {
         const key = getProductKey(updatedProduct);
         if (!key) return prev.map((p) => (p === updatedProduct ? updatedProduct : p));
-        // replace existing product with same key, or add if missing — keep list unique
         const others = prev.filter((p) => getProductKey(p) !== key);
         return [updatedProduct, ...others];
       });
@@ -359,42 +351,24 @@ export default function EditPage() {
   const handleDelete = async () => {
     if (!editorData) return;
     const id = editorData.id || editorData._id;
-    if (!id) {
-      setStatusMessage("Produto inválido para deletar.");
-      return;
-    }
-
-    // Confirm deletion
+    if (!id) { setStatusMessage("Produto inválido para deletar."); return; }
     const confirmed = window.confirm(
       `Tem certeza que deseja deletar o produto "${editorData.titulo_geral}"?\n\nEsta ação não pode ser desfeita. Todas as imagens serão deletadas do AWS também.`
     );
-
     if (!confirmed) return;
-
     try {
       setUploading(true);
       setStatusMessage("Deletando produto e imagens...");
-
       const res = await fetch(`${API_BASE_URL}/products/${id}`, {
         method: "DELETE",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
       });
-
       if (!res.ok) {
         const errorData = await res.json();
         throw new Error(errorData.erro || "Falha ao deletar produto");
       }
-
       setStatusMessage("Produto deletado com sucesso.");
-      
-      // Remove from products list
-      setProducts((prev) =>
-        prev.filter((product) => product._id !== id && product.id !== id)
-      );
-      
-      // Clear editor
+      setProducts((prev) => prev.filter((product) => product._id !== id && product.id !== id));
       setEditorData(null);
       setSelectedProductId(null);
     } catch (err) {
@@ -407,19 +381,58 @@ export default function EditPage() {
 
   return (
     <div className="edit-page-container">
+      {savingOrder && (
+        <div style={{
+          position: "fixed", top: 16, right: 16, zIndex: 1000,
+          background: "#333", color: "#fff", padding: "8px 16px",
+          borderRadius: "6px", fontSize: "13px",
+        }}>
+          Salvando ordem...
+        </div>
+      )}
+
       <div className="central-container">
         {products.map((product) => (
           <div
             className="product-card"
             key={product.id || product._id}
             onClick={() => selectProduct(product)}
-            style={{ cursor: "pointer", border: selectedProductId === (product.id || product._id) ? "2px solid #007BFF" : "none" }}
+            style={{
+              cursor: "pointer",
+              border: selectedProductId === (product.id || product._id)
+                ? "2px solid #007BFF"
+                : "none",
+            }}
           >
             <img src={getImage(product)} alt={product.titulo_geral} className="product-image" />
             <div style={{ padding: "12px" }}>
               <h3>{product.titulo_geral}</h3>
               <p>A PARTIR DE</p>
               <p>Preço: R$ {getPrice(product)}</p>
+
+              {/* ─── Campo de ordem ─── */}
+              <div
+                style={{ marginTop: "8px", display: "flex", alignItems: "center", gap: "6px" }}
+                onClick={(e) => e.stopPropagation()}
+              >
+                <label style={{ fontSize: "12px", color: "#555", whiteSpace: "nowrap" }}>
+                  Ordem:
+                </label>
+                <input
+                  type="number"
+                  defaultValue={product.ordem ?? ""}
+                  onBlur={(e) => {
+                    const novaOrdem = parseInt(e.target.value, 10);
+                    if (!isNaN(novaOrdem) && novaOrdem !== product.ordem) {
+                      handleChangeOrdem(getProductKey(product), novaOrdem);
+                    }
+                  }}
+                  style={{
+                    width: "60px", padding: "4px 6px", borderRadius: "4px",
+                    border: "1px solid #ddd", fontSize: "13px", textAlign: "center",
+                  }}
+                />
+              </div>
             </div>
           </div>
         ))}
@@ -490,7 +503,7 @@ export default function EditPage() {
 
           <section style={{ marginBottom: "24px", padding: "16px", border: "1px solid #ddd", borderRadius: "6px" }}>
             <h3>Informações do Produto</h3>
-            
+
             <div style={{ marginBottom: "16px" }}>
               <label style={{ display: "block", marginBottom: "8px", fontWeight: "bold" }}>Título</label>
               <input
@@ -550,26 +563,13 @@ export default function EditPage() {
                     <button
                       type="button"
                       onClick={() => removeVariant(idx)}
-                      style={{
-                        position: "absolute",
-                        top: "8px",
-                        right: "8px",
-                        background: "#dc3545",
-                        color: "white",
-                        border: "none",
-                        borderRadius: "4px",
-                        padding: "6px 12px",
-                        cursor: "pointer",
-                        fontSize: "12px",
-                      }}
+                      style={{ position: "absolute", top: "8px", right: "8px", background: "#dc3545", color: "white", border: "none", borderRadius: "4px", padding: "6px 12px", cursor: "pointer", fontSize: "12px" }}
                     >
                       Remover
                     </button>
-                    
                     <p style={{ margin: "0 0 12px 0", fontWeight: "bold", paddingRight: "80px" }}>
                       ID: {variant.id || `Variante ${idx + 1}`}
                     </p>
-                    
                     <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "12px", marginBottom: "12px" }}>
                       <div>
                         <label style={{ display: "block", fontSize: "12px", fontWeight: "bold", marginBottom: "4px" }}>Cor/Acabamento</label>
@@ -591,7 +591,6 @@ export default function EditPage() {
                         />
                       </div>
                     </div>
-
                     <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: "12px" }}>
                       <div>
                         <label style={{ display: "block", fontSize: "12px", fontWeight: "bold", marginBottom: "4px" }}>Altura</label>
@@ -636,16 +635,7 @@ export default function EditPage() {
             <button
               type="button"
               onClick={addVariant}
-              style={{
-                marginTop: "12px",
-                padding: "10px 16px",
-                background: "#28a745",
-                color: "white",
-                border: "none",
-                borderRadius: "4px",
-                cursor: "pointer",
-                fontWeight: "bold",
-              }}
+              style={{ marginTop: "12px", padding: "10px 16px", background: "#28a745", color: "white", border: "none", borderRadius: "4px", cursor: "pointer", fontWeight: "bold" }}
             >
               + Adicionar Variante
             </button>
@@ -671,7 +661,7 @@ export default function EditPage() {
           </div>
         </div>
       )}
-      <a href="/admin" >Adcionar Produto</a>
+      <a href="/admin">Adcionar Produto</a>
     </div>
   );
 }

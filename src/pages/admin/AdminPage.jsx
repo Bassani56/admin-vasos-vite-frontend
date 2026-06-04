@@ -327,11 +327,20 @@ export default function AdminPage() {
             }
         });
 
+        const descricao = `O ${titulo} combina um visual moderno com textura escovada que destaca sua presença em qualquer ambiente. 
+                            Versátil e elegante, é ideal para plantas médias e para compor espaços internos ou externos.
+                            Material: Ceramica artesanal
+                            Medidas: ${variantes.map(v => v.tamanho).filter(t => t).join(', ')}
+                            Acabamentos disponiveis: ${[...new Set(variantes.map(v => v.acabamento))].join(', ')}
+                            Por ser artesanal, cada peca pode apresentar pequenas variacoes, tornando cada produto unico e especial.
+                            Caso queira um acabamento personalizado, entre em contato conosco para discutir suas preferencias.`;
+
+                            
         const produto = {
             ativo: true,
             titulo_geral: titulo,
             categorias,
-            descricao: "",
+            descricao,
             imagem_geral,
             imagens_por_cor,
             variantes

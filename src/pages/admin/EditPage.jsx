@@ -318,7 +318,7 @@ export default function EditPage() {
         imagens_por_cor: normalizeColorBuckets(editorData.imagens_por_cor),
         variantes: editorData.variantes || [],
       };
-      const res = await fetch(`${API_BASE_URL}/products/${id}`, {
+      const res = await fetch(`${API_BASE_URL}/produto/${id}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
@@ -359,7 +359,7 @@ export default function EditPage() {
     try {
       setUploading(true);
       setStatusMessage("Deletando produto e imagens...");
-      const res = await fetch(`${API_BASE_URL}/products/${id}`, {
+      const res = await fetch(`${API_BASE_URL}/produto/${id}`, {
         method: "DELETE",
         headers: { "Content-Type": "application/json" },
       });

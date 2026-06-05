@@ -150,21 +150,19 @@ export default function EditPage() {
   };
 
   const imageTypes = (() => {
-    if (!editorData) return [];
-    const types = new Set();
-    const hasNatural = editorData.variantes?.some(
-      (v) => (v.acabamento || v.cor || "").toString().toLowerCase() === "natural"
-    );
-    if (hasNatural) types.add("natural");
-    editorData.variantes?.forEach((v) => {
-      const type = (v.acabamento || v.cor || "").toString();
-      if (type && type.toLowerCase() !== "natural") types.add(type);
-    });
-    editorData.imagens_por_cor?.forEach((bucket) => {
-      if (bucket.cor) types.add(bucket.cor);
-    });
-    return Array.from(types);
-  })();
+  if (!editorData) return [];
+  const types = new Set();
+  const hasNatural = editorData.variantes?.some(
+    (v) => (v.acabamento || v.cor || "").toString().toLowerCase() === "natural"
+  );
+  if (hasNatural) types.add("natural");
+  editorData.variantes?.forEach((v) => {
+    const type = (v.acabamento || v.cor || "").toString();
+    if (type && type.toLowerCase() !== "natural") types.add(type);
+  });
+  // Removido: não adicionar mais cores de imagens_por_cor sem variante correspondente
+  return Array.from(types);
+})();
 
   const updateVariant = (index, field, value) => {
     if (!editorData || !editorData.variantes) return;
@@ -221,10 +219,28 @@ export default function EditPage() {
 
   const removeVariant = (index) => {
     if (!editorData || !editorData.variantes) return;
-    setEditorData((prev) =>
-      prev ? { ...prev, variantes: prev.variantes.filter((_, i) => i !== index) } : prev
+    const variantToRemove = editorData.variantes[index];
+    const acabamentoToRemove = variantToRemove?.acabamento || variantToRemove?.cor;
+
+    // Verifica se alguma outra variante usa o mesmo acabamento
+    const outrasVariantesComMesmoAcabamento = editorData.variantes.filter(
+      (v, i) => i !== index && (v.acabamento || v.cor) === acabamentoToRemove
     );
+
+    setEditorData((prev) => {
+      if (!prev) return prev;
+      const novasVariantes = prev.variantes.filter((_, i) => i !== index);
+
+      // Só remove o bucket de imagens se nenhuma outra variante usa o mesmo acabamento
+      const novasImagens =
+        acabamentoToRemove && outrasVariantesComMesmoAcabamento.length === 0
+          ? (prev.imagens_por_cor || []).filter((bucket) => bucket.cor !== acabamentoToRemove)
+          : prev.imagens_por_cor;
+
+      return { ...prev, variantes: novasVariantes, imagens_por_cor: novasImagens };
+    });
   };
+
 
   const getBucketImages = (type) => {
     if (!editorData) return [];
@@ -329,6 +345,7 @@ export default function EditPage() {
       }
       const updatedProduct = await res.json();
       setStatusMessage("Produto atualizado com sucesso.");
+      alert("Produto atualizado com sucesso.");
       setEditorData({
         ...updatedProduct,
         imagem_geral: normalizeImages(updatedProduct.imagem_geral),

@@ -187,6 +187,7 @@ export default function ProductEdit() {
         ordem: product.ordem,
         novidade: product.novidade,
         personalizavel: product.personalizavel,
+        destaque: product.destaque,
         codigo,
       };
 
@@ -432,6 +433,14 @@ function TabInfo({ product, updateField, addCategory, removeCategory }) {
               onChange={(e) => updateField("personalizavel", e.target.checked)}
             />
             <span>Personalizável</span>
+          </label>
+          <label className="pe-toggle-item">
+            <input
+              type="checkbox"
+              checked={!!product.destaque}
+              onChange={(e) => updateField("destaque", e.target.checked)}
+            />
+            <span>Produto em Destaque</span>
           </label>
         </div>
       </div>

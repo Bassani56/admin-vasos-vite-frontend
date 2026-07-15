@@ -25,6 +25,12 @@
   margin: 0;
 }
 
+.pl-header-right {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
 .pl-btn-primary {
   padding: 10px 20px;
   background: #1a1a1a;
@@ -41,6 +47,41 @@
 .pl-btn-primary:hover {
   background: #333;
   transform: translateY(-1px);
+}
+
+/* ─── View Toggle ──────────────────────────────────────── */
+.pl-view-toggle {
+  display: flex;
+  border: 1.5px solid #e0dbd3;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.pl-view-btn {
+  width: 36px;
+  height: 36px;
+  border: none;
+  background: #fff;
+  font-size: 18px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.15s, color 0.15s;
+  color: #888;
+}
+
+.pl-view-btn:first-child {
+  border-right: 1px solid #e0dbd3;
+}
+
+.pl-view-btn.active {
+  background: #1a1a1a;
+  color: #fff;
+}
+
+.pl-view-btn:hover:not(.active) {
+  background: #f7f5f2;
 }
 
 /* ─── Filters ──────────────────────────────────────────── */
@@ -348,5 +389,237 @@
 
   .pl-search {
     min-width: unset;
+  }
+}
+
+/* ─── Grid Hint ────────────────────────────────────────── */
+.pl-grid-hint {
+  font-size: 13px;
+  color: #888;
+  background: #f0ede8;
+  padding: 10px 16px;
+  border-radius: 8px;
+  margin-bottom: 16px;
+}
+
+/* ─── Grid View ────────────────────────────────────────── */
+.pl-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 16px;
+}
+
+/* ─── Grid Card ────────────────────────────────────────── */
+.pl-grid-card {
+  position: relative;
+  background: #fff;
+  border-radius: 12px;
+  overflow: hidden;
+  border: 2px solid transparent;
+  cursor: grab;
+  transition: border-color 0.15s, box-shadow 0.2s, transform 0.15s, opacity 0.15s;
+  display: flex;
+  flex-direction: column;
+}
+
+.pl-grid-card:hover {
+  border-color: #d0cdc7;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+}
+
+.pl-grid-card:active {
+  cursor: grabbing;
+}
+
+.pl-grid-card.dragging {
+  border-color: #1a1a1a;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.18);
+}
+
+.pl-grid-card.inactive {
+  opacity: 0.6;
+}
+
+.pl-grid-card.inactive:hover {
+  opacity: 0.9;
+}
+
+/* Drag handle */
+.pl-grid-card-drag {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  background: rgba(0, 0, 0, 0.5);
+  color: #fff;
+  font-size: 14px;
+  width: 24px;
+  height: 24px;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: opacity 0.15s;
+  z-index: 2;
+  pointer-events: none;
+}
+
+.pl-grid-card:hover .pl-grid-card-drag {
+  opacity: 1;
+}
+
+/* Order badge */
+.pl-grid-card-order {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  background: rgba(0, 0, 0, 0.6);
+  color: #fff;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 4px;
+  z-index: 2;
+}
+
+/* Image */
+.pl-grid-card-img {
+  width: 100%;
+  height: 180px;
+  background: #ece9e3;
+  overflow: hidden;
+}
+
+.pl-grid-card-img img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  pointer-events: none;
+  transition: transform 0.25s;
+}
+
+.pl-grid-card:hover .pl-grid-card-img img {
+  transform: scale(1.04);
+}
+
+.pl-grid-card-img-placeholder {
+  width: 100%;
+  height: 100%;
+  background: #e0dbd3;
+}
+
+/* Body */
+.pl-grid-card-body {
+  padding: 12px 14px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  flex: 1;
+}
+
+.pl-grid-card-title {
+  font-size: 13px;
+  font-weight: 500;
+  margin: 0;
+  color: #1a1a1a;
+  line-height: 1.3;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.pl-grid-card-price {
+  font-size: 14px;
+  font-weight: 600;
+  color: #1a1a1a;
+}
+
+.pl-grid-card-meta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 4px;
+}
+
+.pl-grid-card-status {
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  padding: 2px 6px;
+  border-radius: 4px;
+}
+
+.pl-grid-card-status.active {
+  background: #dcfce7;
+  color: #166534;
+}
+
+.pl-grid-card-status.inactive {
+  background: #fee2e2;
+  color: #991b1b;
+}
+
+.pl-grid-card-variants {
+  font-size: 11px;
+  color: #999;
+}
+
+/* Actions overlay */
+.pl-grid-card-actions {
+  position: absolute;
+  bottom: 8px;
+  right: 8px;
+  display: flex;
+  gap: 4px;
+  opacity: 0;
+  transition: opacity 0.15s;
+  z-index: 3;
+}
+
+.pl-grid-card:hover .pl-grid-card-actions {
+  opacity: 1;
+}
+
+.pl-grid-card-actions button {
+  width: 30px;
+  height: 30px;
+  border: none;
+  background: rgba(255, 255, 255, 0.9);
+  border-radius: 6px;
+  font-size: 14px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.15);
+  transition: background 0.12s;
+}
+
+.pl-grid-card-actions button:hover {
+  background: #fff;
+}
+
+/* ─── Responsive Grid ──────────────────────────────────── */
+@media (max-width: 600px) {
+  .pl-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+  }
+
+  .pl-grid-card-img {
+    height: 140px;
+  }
+
+  .pl-grid-card-drag {
+    opacity: 0.7;
+  }
+
+  .pl-header-right {
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 8px;
   }
 }

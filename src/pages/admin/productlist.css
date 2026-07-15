@@ -1,0 +1,352 @@
+/* ─── Product List Page ─────────────────────────────────── */
+.product-list-page {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.pl-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-bottom: 24px;
+}
+
+.pl-header h1 {
+  font-family: 'DM Serif Display', serif;
+  font-size: 28px;
+  font-weight: 400;
+  margin: 0 0 4px;
+  color: #1a1a1a;
+}
+
+.pl-subtitle {
+  font-size: 13px;
+  color: #888;
+  margin: 0;
+}
+
+.pl-btn-primary {
+  padding: 10px 20px;
+  background: #1a1a1a;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  font-family: 'DM Sans', sans-serif;
+  cursor: pointer;
+  transition: background 0.15s, transform 0.1s;
+}
+
+.pl-btn-primary:hover {
+  background: #333;
+  transform: translateY(-1px);
+}
+
+/* ─── Filters ──────────────────────────────────────────── */
+.pl-filters {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+}
+
+.pl-search {
+  flex: 1;
+  min-width: 200px;
+  padding: 10px 14px;
+  border: 1.5px solid #e0dbd3;
+  border-radius: 8px;
+  font-size: 14px;
+  font-family: 'DM Sans', sans-serif;
+  background: #fff;
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.pl-search:focus {
+  border-color: #1a1a1a;
+}
+
+.pl-select {
+  padding: 10px 14px;
+  border: 1.5px solid #e0dbd3;
+  border-radius: 8px;
+  font-size: 14px;
+  font-family: 'DM Sans', sans-serif;
+  background: #fff;
+  outline: none;
+  cursor: pointer;
+}
+
+/* ─── Bulk Bar ─────────────────────────────────────────── */
+.pl-bulk-bar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 16px;
+  background: #eef2ff;
+  border: 1px solid #c7d2fe;
+  border-radius: 8px;
+  margin-bottom: 16px;
+  font-size: 13px;
+}
+
+.pl-bulk-bar span {
+  font-weight: 600;
+  color: #3730a3;
+}
+
+.pl-bulk-bar button {
+  padding: 6px 12px;
+  border: 1px solid #c7d2fe;
+  border-radius: 6px;
+  background: #fff;
+  font-size: 12px;
+  font-family: 'DM Sans', sans-serif;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.pl-bulk-bar button:hover {
+  background: #e0e7ff;
+}
+
+/* ─── Saving indicator ─────────────────────────────────── */
+.pl-saving {
+  position: fixed;
+  top: 16px;
+  right: 16px;
+  z-index: 1000;
+  background: #333;
+  color: #fff;
+  padding: 8px 16px;
+  border-radius: 6px;
+  font-size: 13px;
+}
+
+.pl-loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 300px;
+  color: #999;
+}
+
+/* ─── Table ────────────────────────────────────────────── */
+.pl-table-container {
+  background: #fff;
+  border-radius: 12px;
+  border: 1px solid #ece9e4;
+  overflow: hidden;
+}
+
+.pl-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+
+.pl-table thead {
+  background: #fafaf8;
+  border-bottom: 1px solid #ece9e4;
+}
+
+.pl-table th {
+  padding: 12px 16px;
+  text-align: left;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: #888;
+}
+
+.pl-table td {
+  padding: 12px 16px;
+  border-bottom: 1px solid #f5f3f0;
+  vertical-align: middle;
+}
+
+.pl-table tr:last-child td {
+  border-bottom: none;
+}
+
+.pl-table tr.selected {
+  background: #f5f3ff;
+}
+
+.pl-table tr:hover {
+  background: #fafaf8;
+}
+
+.pl-th-check,
+.pl-td-check {
+  width: 40px;
+  text-align: center;
+}
+
+/* ─── Product Cell ─────────────────────────────────────── */
+.pl-product-cell {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.pl-product-img {
+  width: 48px;
+  height: 48px;
+  border-radius: 8px;
+  overflow: hidden;
+  flex-shrink: 0;
+  background: #ece9e3;
+}
+
+.pl-product-img img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.pl-img-placeholder {
+  width: 100%;
+  height: 100%;
+  background: #e0dbd3;
+}
+
+.pl-product-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.pl-product-name {
+  font-weight: 500;
+  color: #1a1a1a;
+  font-size: 14px;
+}
+
+.pl-product-variants {
+  font-size: 12px;
+  color: #999;
+}
+
+/* ─── Tags ─────────────────────────────────────────────── */
+.pl-tag {
+  display: inline-block;
+  padding: 3px 8px;
+  background: #f0ede8;
+  border-radius: 4px;
+  font-size: 11px;
+  color: #666;
+  margin-right: 4px;
+}
+
+/* ─── Price ────────────────────────────────────────────── */
+.pl-td-price {
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+/* ─── Order Input ──────────────────────────────────────── */
+.pl-order-input {
+  width: 60px;
+  padding: 6px 8px;
+  border: 1.5px solid #e0dbd3;
+  border-radius: 6px;
+  font-size: 13px;
+  text-align: center;
+  font-family: 'DM Sans', sans-serif;
+  outline: none;
+}
+
+.pl-order-input:focus {
+  border-color: #1a1a1a;
+}
+
+/* ─── Toggle Switch ────────────────────────────────────── */
+.pl-toggle {
+  position: relative;
+  width: 40px;
+  height: 22px;
+  border-radius: 11px;
+  border: none;
+  cursor: pointer;
+  transition: background 0.2s;
+  padding: 0;
+}
+
+.pl-toggle.active {
+  background: #22c55e;
+}
+
+.pl-toggle.inactive {
+  background: #d1d5db;
+}
+
+.pl-toggle-knob {
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: #fff;
+  transition: transform 0.2s;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+}
+
+.pl-toggle.active .pl-toggle-knob {
+  transform: translateX(18px);
+}
+
+/* ─── Actions ──────────────────────────────────────────── */
+.pl-actions {
+  display: flex;
+  gap: 4px;
+}
+
+.pl-action-btn {
+  width: 32px;
+  height: 32px;
+  border: none;
+  background: transparent;
+  border-radius: 6px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  text-decoration: none;
+  transition: background 0.12s;
+}
+
+.pl-action-btn:hover {
+  background: #f0ede8;
+}
+
+/* ─── Responsive ───────────────────────────────────────── */
+@media (max-width: 900px) {
+  .pl-table-container {
+    overflow-x: auto;
+  }
+
+  .pl-table {
+    min-width: 700px;
+  }
+}
+
+@media (max-width: 600px) {
+  .pl-header {
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .pl-filters {
+    flex-direction: column;
+  }
+
+  .pl-search {
+    min-width: unset;
+  }
+}

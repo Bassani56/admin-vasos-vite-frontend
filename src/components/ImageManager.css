@@ -1,0 +1,203 @@
+/* ─── Image Manager ────────────────────────────────────── */
+.im-container {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+/* ─── Image Grid ───────────────────────────────────────── */
+.im-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: 12px;
+}
+
+/* ─── Image Item ───────────────────────────────────────── */
+.im-item {
+  position: relative;
+  aspect-ratio: 1;
+  border-radius: 10px;
+  overflow: hidden;
+  cursor: grab;
+  background: #ece9e3;
+  border: 2px solid transparent;
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+
+.im-item:hover {
+  border-color: #d0cdc7;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.im-item.cover {
+  border-color: #f59e0b;
+}
+
+.im-item:active {
+  cursor: grabbing;
+}
+
+.im-item img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  pointer-events: none;
+}
+
+/* Cover Badge */
+.im-cover-badge {
+  position: absolute;
+  top: 6px;
+  left: 6px;
+  background: #f59e0b;
+  color: #fff;
+  font-size: 10px;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 4px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+/* Actions overlay */
+.im-item-actions {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  display: flex;
+  gap: 4px;
+  opacity: 0;
+  transition: opacity 0.15s;
+}
+
+.im-item:hover .im-item-actions {
+  opacity: 1;
+}
+
+.im-btn-cover,
+.im-btn-remove {
+  width: 26px;
+  height: 26px;
+  border: none;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.im-btn-crop {
+  width: 26px;
+  height: 26px;
+  border: none;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+  cursor: pointer;
+  transition: background 0.15s;
+  background: rgba(255, 255, 255, 0.9);
+  color: #555;
+}
+
+.im-btn-crop:hover {
+  background: #3b82f6;
+  color: #fff;
+}
+
+.im-btn-cover {
+  background: rgba(255, 255, 255, 0.9);
+  color: #f59e0b;
+}
+
+.im-btn-cover:hover {
+  background: #f59e0b;
+  color: #fff;
+}
+
+.im-btn-remove {
+  background: rgba(0, 0, 0, 0.6);
+  color: #fff;
+  font-size: 18px;
+}
+
+.im-btn-remove:hover {
+  background: #c0392b;
+}
+
+/* Drag hint */
+.im-drag-hint {
+  position: absolute;
+  bottom: 6px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(0, 0, 0, 0.5);
+  color: #fff;
+  font-size: 12px;
+  padding: 2px 8px;
+  border-radius: 4px;
+  opacity: 0;
+  transition: opacity 0.15s;
+  pointer-events: none;
+}
+
+.im-item:hover .im-drag-hint {
+  opacity: 1;
+}
+
+/* ─── Upload Area ──────────────────────────────────────── */
+.im-upload-area {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 24px;
+  border: 2px dashed #d0cdc7;
+  border-radius: 10px;
+  background: #fafaf8;
+  transition: border-color 0.2s, background 0.2s;
+}
+
+.im-upload-area.drag-over {
+  border-color: #1a1a1a;
+  background: #f0ede8;
+}
+
+.im-upload-icon {
+  font-size: 24px;
+}
+
+.im-upload-text {
+  font-size: 13px;
+  color: #888;
+}
+
+.im-upload-label {
+  color: #1a1a1a;
+  font-weight: 600;
+  cursor: pointer;
+  text-decoration: underline;
+}
+
+.im-uploading {
+  font-size: 14px;
+  color: #666;
+  font-weight: 500;
+}
+
+/* ─── Responsive ───────────────────────────────────────── */
+@media (max-width: 500px) {
+  .im-grid {
+    grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+    gap: 8px;
+  }
+
+  .im-item-actions {
+    opacity: 1;
+  }
+}

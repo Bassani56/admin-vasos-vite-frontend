@@ -1,0 +1,273 @@
+================================================================================
+  CONTEXTO TÉCNICO PARA O PAINEL ADMIN
+  Projeto: Casa do Oleiro (casadooleiroo.com.br)
+  Data: 14/07/2026
+================================================================================
+
+Este documento descreve a estrutura de dados dos produtos, como o frontend
+os consome, e detalhes importantes para quem vai editar/criar o painel admin.
+
+
+════════════════════════════════════════════════════════════════════════════════
+  1. BANCO DE DADOS
+════════════════════════════════════════════════════════════════════════════════
+
+  - MongoDB (Mongoose)
+  - Database: "meu_banco"
+  - Collection usada: "cards_json" (schema com strict: false)
+  - O model antigo "Produto" (models/Produto.js) NÃO é usado no servidor
+    principal. O servidor usa:
+
+      const CardSchema = new mongoose.Schema({}, { strict: false })
+      const Card = mongoose.model('cards_json', CardSchema, 'cards_json')
+
+  - Ou seja, qualquer campo pode ser adicionado sem alterar schema.
+
+
+════════════════════════════════════════════════════════════════════════════════
+  2. FORMATO DE DADOS DE UM PRODUTO (como o frontend espera)
+════════════════════════════════════════════════════════════════════════════════
+
+  {
+    "_id": "ObjectId",           // ID do MongoDB (string hex de 24 chars)
+
+    "titulo_geral": "String",    // ⚠️ CAMPO PRINCIPAL DE TÍTULO
+                                 // Usado em cards, SEO, WhatsApp, slug de URL
+
+    "descricao": "String",       // Descrição longa do produto (pode ter \n)
+                                 // Se vazio, frontend mostra texto genérico
+
+    "categorias": ["String"],    // Array de categorias (ex: ["vaso", "decoração"])
+                                 // Usada no filtro da home
+
+    "ordem": Number,             // Ordem de exibição na home (menor = primeiro)
+                                 // Se ausente, vai para o final (Infinity)
+
+    "ativo": Boolean,            // Se false, produto não aparece no site
+                                 // Se ausente ou true, produto aparece
+
+    "codigo": "String",          // Código interno (ex: "1", "1.1", "1.2")
+                                 // Se contém "." = variação (sitemap separado)
+
+    "novidade": Boolean,         // Se true, mostra badge "Novidade" no card
+    "personalizavel": Boolean,   // Se true, mostra badge "Personalizável"
+
+    "variantes": [               // ⚠️ OBRIGATÓRIO — Array de variações
+      {
+        "acabamento": "String",  // Ex: "Natural", "Pintado", "Rústico"
+        "tamanho": "String",     // Ex: "15cm x 20cm", "P", "M", "G"
+        "preco": Number,         // ⚠️ PREÇO NUMÉRICO (ex: 25, 30.50)
+        "dimensoes": {           // Opcional
+          "altura": "String",
+          "largura": "String"
+        }
+      }
+    ],
+
+    "imagem_geral": [            // ⚠️ Imagens principais do produto
+      {
+        "url": "String"          // URL ou path relativo (ex: "/images/vaso.webp")
+      }
+    ],
+
+    "imagens_por_cor": [         // Opcional — imagens separadas por acabamento
+      {
+        "cor": "String",         // Nome do acabamento (deve bater com variantes)
+        "imagens": [
+          { "url": "String" }
+        ]
+      }
+    ],
+
+    "imagens": ["String"],       // Array de paths de diretórios de imagens
+                                 // O backend resolve esses paths em URLs reais
+                                 // Ex: ["/images/celular_formato/estilo1/m2"]
+
+    "updatedAt": "Date"          // Se existir, usado no <lastmod> do sitemap
+  }
+
+
+════════════════════════════════════════════════════════════════════════════════
+  3. CAMPOS MAIS IMPORTANTES (que o admin PRECISA editar)
+════════════════════════════════════════════════════════════════════════════════
+
+  OBRIGATÓRIOS para o produto aparecer corretamente:
+    • titulo_geral     → aparece em cards, H1, SEO, mensagem WhatsApp, URL
+    • variantes[]      → sem isso, preço não aparece e página quebra
+    • variantes[].preco → DEVE ser Number (não string)
+    • imagem_geral[]   → sem isso, card fica sem foto
+
+  IMPORTANTES para funcionalidades:
+    • categorias[]     → filtro na home
+    • descricao        → seção "Descrição Geral" na página do produto
+    • ativo            → controla visibilidade (false = esconde)
+    • ordem            → controla posição na listagem da home
+
+  OPCIONAIS:
+    • imagens_por_cor  → galeria por acabamento
+    • novidade         → badge visual
+    • personalizavel   → badge visual
+    • codigo           → classificação interna
+
+
+════════════════════════════════════════════════════════════════════════════════
+  4. COMO O FRONTEND GERA URLs DE PRODUTO
+════════════════════════════════════════════════════════════════════════════════
+
+  Fórmula:
+    /produtos/{slug}-{_id}
+
+  Onde slug = gerarSlug(titulo_geral):
+    - lowercase
+    - remove acentos (NFD + regex)
+    - substitui caracteres não-alfanuméricos por "-"
+    - remove hífens no início/fim
+
+  Exemplos:
+    titulo_geral: "Vasos parede babado com prato"
+    _id: "6987dc03276fad151ee3f2a3"
+    URL: /produtos/vasos-parede-babado-com-prato-6987dc03276fad151ee3f2a3
+
+    titulo_geral: "Vaso Rústico Grande"
+    _id: "abc123def456"
+    URL: /produtos/vaso-rustico-grande-abc123def456
+
+
+════════════════════════════════════════════════════════════════════════════════
+  5. ENDPOINTS DA API (backend atual)
+════════════════════════════════════════════════════════════════════════════════
+
+  Base URL: https://new-vite-vasos-backend.vercel.app
+
+  GET /produtos
+    → Retorna array com todos os produtos ativos (imagens resolvidas)
+
+  GET /produto/:slug
+    → Retorna um produto pelo slug-id
+    → Extrai o ID do final do slug (último "-" separa slug de ID)
+    → Se não achar por ID, busca por slug entre os ativos
+
+  GET /sitemap.xml
+    → XML com todas URLs de produtos ativos
+
+  GET /sitemap-variacoes.xml
+    → XML com variações (produtos com "." no código)
+
+  POST /analytics/whatsapp
+    → Registra clique de WhatsApp (produtoId, produtoTitulo)
+
+  Endpoint do ADMIN (outro backend):
+    PUT https://admin-vasos-vite-backend.vercel.app/products/:id/auto-description
+    → Gera descrição automática para produtos sem descrição
+
+
+════════════════════════════════════════════════════════════════════════════════
+  6. DETALHES IMPORTANTES PARA O ADMIN
+════════════════════════════════════════════════════════════════════════════════
+
+  • PREÇO deve ser Number, não String
+    ✅ Correto: { "preco": 25.50 }
+    ❌ Errado:  { "preco": "25.50" }
+    → O frontend faz Number(preco) e formata com toFixed(2)
+
+  • TITULO_GERAL é o campo de título (não "titulo")
+    → O campo "titulo" do schema antigo pode existir mas não é usado
+    → O frontend lê exclusivamente "titulo_geral"
+
+  • IMAGEM_GERAL é array de objetos com { url: "..." }
+    ✅ Correto: [{ "url": "/images/vaso.webp" }]
+    ❌ Errado:  ["/images/vaso.webp"]  (isso é o campo "imagens", diferente)
+
+  • CATEGORIAS é array de strings
+    ✅ Correto: ["vaso", "decoração"]
+    ❌ Errado:  "vaso" (string simples)
+
+  • VARIANTES deve ter pelo menos 1 item
+    → Se o array estiver vazio ou ausente, a página de produto quebra
+    → Cada variante PRECISA ter: acabamento, tamanho, preco
+
+  • ATIVO = false esconde o produto
+    → Se o campo não existir, o produto é considerado ativo
+    → Para desativar: setar explicitamente "ativo": false
+
+  • ORDEM controla posição na home
+    → Menor número aparece primeiro
+    → Se ausente, vai para o final
+    → Aceita decimais (ex: 1.5 fica entre 1 e 2)
+
+  • O campo "imagens" (array de strings/paths) é resolvido pelo BACKEND
+    → O backend lê os diretórios e expande em URLs de arquivo
+    → Diferente de "imagem_geral" que já tem URLs prontas
+
+
+════════════════════════════════════════════════════════════════════════════════
+  7. COLLECTION NO MONGODB — RESUMO
+════════════════════════════════════════════════════════════════════════════════
+
+  Database:    meu_banco
+  Collection:  cards_json
+  Schema:      Sem validação (strict: false)
+  Modelo:      Card = mongoose.model('cards_json', {}, 'cards_json')
+
+
+════════════════════════════════════════════════════════════════════════════════
+  8. EXEMPLO DE PRODUTO COMPLETO (formato ideal)
+════════════════════════════════════════════════════════════════════════════════
+
+  {
+    "_id": "6987dc03276fad151ee3f2a3",
+    "titulo_geral": "Vaso Parede Babado com Prato",
+    "descricao": "Vaso artesanal para parede com acabamento babado.\nAcompanha prato de apoio.\nIdeal para suculentas e plantas pendentes.",
+    "categorias": ["vaso de parede", "decoração"],
+    "ordem": 5,
+    "ativo": true,
+    "codigo": "1",
+    "novidade": false,
+    "personalizavel": true,
+    "variantes": [
+      {
+        "acabamento": "Natural",
+        "tamanho": "15cm x 20cm",
+        "preco": 25
+      },
+      {
+        "acabamento": "Pintado",
+        "tamanho": "15cm x 20cm",
+        "preco": 30
+      },
+      {
+        "acabamento": "Natural",
+        "tamanho": "20cm x 25cm",
+        "preco": 35
+      },
+      {
+        "acabamento": "Pintado",
+        "tamanho": "20cm x 25cm",
+        "preco": 42
+      }
+    ],
+    "imagem_geral": [
+      { "url": "/images/img_edit/img1/parede_babado_com_prato.webp" }
+    ],
+    "imagens_por_cor": [
+      {
+        "cor": "Natural",
+        "imagens": [
+          { "url": "/images/img_edit/img1/natural_1.webp" },
+          { "url": "/images/img_edit/img1/natural_2.webp" }
+        ]
+      },
+      {
+        "cor": "Pintado",
+        "imagens": [
+          { "url": "/images/img_edit/img1/pintado_1.webp" },
+          { "url": "/images/img_edit/img1/pintado_2.webp" }
+        ]
+      }
+    ]
+  }
+
+
+================================================================================
+  FIM DO DOCUMENTO
+================================================================================

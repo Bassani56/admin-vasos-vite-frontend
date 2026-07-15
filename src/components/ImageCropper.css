@@ -1,0 +1,236 @@
+/* ─── Crop Modal Overlay ───────────────────────────────── */
+.crop-modal-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  background: rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  animation: fadeIn 0.15s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+/* ─── Modal Box ────────────────────────────────────────── */
+.crop-modal {
+  background: #fff;
+  border-radius: 16px;
+  width: 100%;
+  max-width: 700px;
+  max-height: 90vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  animation: slideUp 0.2s ease;
+}
+
+@keyframes slideUp {
+  from { transform: translateY(20px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+/* ─── Header ───────────────────────────────────────────── */
+.crop-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 20px;
+  border-bottom: 1px solid #ece9e4;
+}
+
+.crop-header h3 {
+  font-size: 16px;
+  font-weight: 600;
+  margin: 0;
+  color: #1a1a1a;
+}
+
+.crop-close {
+  width: 32px;
+  height: 32px;
+  border: none;
+  background: #f0ede8;
+  border-radius: 50%;
+  font-size: 20px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #666;
+  transition: background 0.15s;
+}
+
+.crop-close:hover {
+  background: #e0dbd3;
+  color: #1a1a1a;
+}
+
+/* ─── Crop Area ────────────────────────────────────────── */
+.crop-area {
+  position: relative;
+  width: 100%;
+  height: 400px;
+  background: #111;
+}
+
+/* ─── Controls ─────────────────────────────────────────── */
+.crop-controls {
+  padding: 16px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  border-bottom: 1px solid #ece9e4;
+}
+
+.crop-control-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.crop-control-group label {
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: #888;
+}
+
+/* Aspect buttons */
+.crop-aspect-buttons {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.crop-aspect-btn {
+  padding: 6px 12px;
+  border: 1.5px solid #e0dbd3;
+  border-radius: 6px;
+  background: #fafaf8;
+  font-size: 13px;
+  font-weight: 500;
+  color: #555;
+  cursor: pointer;
+  font-family: 'DM Sans', sans-serif;
+  transition: border-color 0.15s, background 0.15s, color 0.15s;
+}
+
+.crop-aspect-btn:hover {
+  border-color: #c8c4be;
+  color: #1a1a1a;
+}
+
+.crop-aspect-btn.active {
+  border-color: #1a1a1a;
+  background: #1a1a1a;
+  color: #fff;
+}
+
+/* Sliders */
+.crop-slider {
+  width: 100%;
+  height: 6px;
+  -webkit-appearance: none;
+  appearance: none;
+  border-radius: 3px;
+  background: #e0dbd3;
+  outline: none;
+  cursor: pointer;
+}
+
+.crop-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: #1a1a1a;
+  cursor: pointer;
+  border: 2px solid #fff;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.3);
+}
+
+.crop-slider::-moz-range-thumb {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: #1a1a1a;
+  cursor: pointer;
+  border: 2px solid #fff;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.3);
+}
+
+/* ─── Actions ──────────────────────────────────────────── */
+.crop-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  padding: 14px 20px;
+}
+
+.crop-btn-cancel {
+  padding: 10px 18px;
+  background: #fff;
+  color: #666;
+  border: 1.5px solid #e0dbd3;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  font-family: 'DM Sans', sans-serif;
+  transition: background 0.15s, border-color 0.15s;
+}
+
+.crop-btn-cancel:hover {
+  background: #f7f5f2;
+  border-color: #c8c4be;
+}
+
+.crop-btn-confirm {
+  padding: 10px 20px;
+  background: #1a1a1a;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: 'DM Sans', sans-serif;
+  transition: background 0.15s;
+}
+
+.crop-btn-confirm:hover:not(:disabled) {
+  background: #333;
+}
+
+.crop-btn-confirm:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* ─── Responsive ───────────────────────────────────────── */
+@media (max-width: 600px) {
+  .crop-modal {
+    max-height: 95vh;
+    border-radius: 12px;
+  }
+
+  .crop-area {
+    height: 300px;
+  }
+
+  .crop-controls {
+    padding: 12px 16px;
+  }
+
+  .crop-actions {
+    padding: 12px 16px;
+  }
+}
